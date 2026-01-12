@@ -1,19 +1,21 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
+from sqlmodel import Session
+
 from core.security import decode_token
-from db.models.user import User
+from db.session import get_session
+from db.repositories.user_repository import UserRepository
 
-async def get_current_user(token: str = Depends(decode_token)) -> User:
-    if not token:
-        raise HTTPException(status_code=401, detail="Not Authenticated")
-    return token
+def get_current_user(
+    payload: dict = Depends(decode_token),
+    session: Session = Depends(get_session),
+):
+    user_id = int(payload["sub"])
+    user = UserRepository(session).get_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
 
-async def get_admin_user(
-    current_user: User = Depends(get_current_user)
-) -> User:
-    if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin privilege required",
-        )
-    return current_user
-
+def get_admin_user(user=Depends(get_current_user)):
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    return user

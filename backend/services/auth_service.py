@@ -1,45 +1,43 @@
-from schemas.auth import LoginRequest, TokenResponse
-from core.security import create_access_token
+from fastapi import HTTPException, status
+from sqlmodel import Session
+
+from core.security import(
+    hash_password,
+    verify_password,
+    create_access_token
+)
 from db.models.user import User
+from db.repositories.user_repository import UserRepository
+from schemas.auth import TokenResponse
 
 class AuthService:
-    @staticmethod
-    async def login(data: LoginRequest) -> TokenResponse:
-        if data.password != "password":
-            raise ValueError("Invalid credentials")
+    def __init__(self, session: Session):
+        self.users = UserRepository(session)
+
+    def register(self, email: str, password: str):
+        if self.users.get_by_email(email):
+            raise HTTPException(
+                status_code=400,
+                detail="Email already registered",
+            )
+
+        user = User(
+            email=email,
+            hashed_password=hash_password(password),
+            role="admin" if email.endswith("@admin.com") else "user",
+        )
+        return self.users.create(user)
+
+    def login(self, email: str, password: str) -> TokenResponse:
+        user = self.users.get_by_email(email)
+
+        if not user or not verify_password(password, user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+            )
         
-        role = "admin" if data.email.endswith("@admin.com") else "user"
-
-        user = User(
-            id=1,
-            email=data.email,
-            role=role,
-        )
-
         token = create_access_token(user)
-
         return TokenResponse(access_token=token)
 
-    @staticmethod
-    async def register(data):
-        return {"message": f"User registered (placeholder)"}
 
-    @staticmethod
-    async def login_oauth(username: str, password: str) -> TokenResponse:
-        if password != "password":
-            raise ValueError("Invalid credentials")
-
-        role = "admin" if username.endswith("@admin.com") else "user"
-
-        user = User(
-            id=1,
-            email=username,  # username == email
-            role=role,
-        )
-
-        token = create_access_token(user)
-
-        return TokenResponse(access_token=token)
-    
-
-    
