@@ -1,8 +1,7 @@
+from db.base import SQLModel
 from db.session import engine
-from db.models.user import User
-from sqlmodel import SQLModel
 
 def init_db():
-    print("📦 Creating database tables...")
-    SQLModel.metadata.create_all(engine)
+    SQLModel.metadata.create_all(bind=engine)
+    print("📦 Tables created:", SQLModel.metadata.tables.keys())
 

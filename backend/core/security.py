@@ -43,6 +43,3 @@ def decode_token(token: str = Depends(oauth2_scheme)) -> User:
             detail="Invalid token",
         )
 
-
-
-
