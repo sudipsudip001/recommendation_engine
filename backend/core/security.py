@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -30,7 +30,7 @@ def create_access_token(user: User) -> str:
         "sub": str(user.id),
         "role": user.role,
         "email": user.email,
-        "exp": datetime.utcnow() + timedelta(hours=0.5)
+        "exp": datetime.now(timezone.utc) + timedelta(hours=0.5)
     }
     return jwt.encode(payload, secret_key, algorithm=algo)
 
