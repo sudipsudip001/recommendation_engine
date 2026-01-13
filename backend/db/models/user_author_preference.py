@@ -11,4 +11,3 @@ class UserAuthorPreference(SQLModel, table=True):
     author_name: str = Field(index=True)
     weight: float = Field(default=1.0)
 
-    

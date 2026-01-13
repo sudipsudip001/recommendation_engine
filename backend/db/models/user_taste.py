@@ -7,12 +7,12 @@ class UserTasteProfile(SQLModel, table=True):
     __tablename__ = "user_taste_profiles"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id", index=True)
+    user_id: int = Field(foreign_key="users.id", index=True)
 
-    preferred_place: Optional[str] = None
+    preferred_pace: Optional[str] = None
     preferred_length: Optional[str] = None
     likes_series: Optional[bool] = None
 
-    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
