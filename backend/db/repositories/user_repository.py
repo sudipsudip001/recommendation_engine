@@ -17,3 +17,4 @@ class UserRepository:
         self.session.commit()
         self.session.refresh(user)
         return user
+

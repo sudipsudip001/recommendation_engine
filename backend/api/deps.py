@@ -41,4 +41,3 @@ def get_admin_user(user=Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin only")
     return user
 
-

@@ -25,4 +25,3 @@ def login(
     service = AuthService(session)
     return service.login(form_data.username, form_data.password)
 
-

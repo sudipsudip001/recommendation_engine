@@ -7,4 +7,3 @@ router = APIRouter(dependencies=[Depends(get_admin_user)])
 async def train_model():
     return {"status": "training started"}
 
-
